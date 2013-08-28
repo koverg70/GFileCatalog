@@ -8,7 +8,7 @@ import java.security.MessageDigest;
 @ToString(includePackage=false)
 class FileDesc
 {
-	final static int DIGEST_BUF = 16384;
+	final static int DIGEST_BUF = 16384*8;
 
 	String path;
 	String name;
@@ -23,24 +23,23 @@ class FileDesc
 		byte[] buffer = new byte[DIGEST_BUF]
 
 		// beginning of file
-		raf.read buffer, 0, (int)([DIGEST_BUF, raf.length()].min())
-		digest.update f.getBytes()
-		/*
+		int len = (int)([DIGEST_BUF, raf.length()].min())
+		raf.read buffer, 0, len
+		digest.update buffer, 0, len
 		if (raf.length() >= DIGEST_BUF*3)
 		{
 			// middle of file
 			raf.seek((long)((raf.length() - DIGEST_BUF) / 2))
 			raf.read buffer, 0, DIGEST_BUF;
-			digest.update f.getBytes()
+			digest.update buffer, 0, DIGEST_BUF
 		}
 		if (raf.length() >= DIGEST_BUF*2)
 		{
 			// end of file
 			raf.seek raf.length() - DIGEST_BUF
 			raf.read buffer, 0, DIGEST_BUF
-			digest.update f.getBytes()
+			digest.update buffer, 0, DIGEST_BUF
 		}
-		*/
 		new BigInteger(1, digest.digest()).toString(16).padLeft(32, '0')
 	}
 
@@ -71,7 +70,7 @@ class FileDesc
 		println "Processing folder " + folderName
 		FileDesc.processFolder new File(folderName), {
 			descrs << it
-			println it.path + "/" + it.name
+			// println it.path + "/" + it.name
 			if (++count % 100 == 0) {
 				println "Processed: " + count
 			}
