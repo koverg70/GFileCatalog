@@ -40,7 +40,7 @@ class ReadFiles
 				md5Hash: it.md5Hash.toString()
 			);
 		}
-		println descrs
+		//println descrs
 
 		Utils.checkDuplicates descrs
 	}

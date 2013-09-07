@@ -62,25 +62,39 @@ class Utils
 		new BigInteger(1, digest.digest()).toString(16).padLeft(32, '0')
 	}
 
-	static checkDuplicates(Collection descrs)
+	static checkDuplicates(Collection<FileDesc> descrs)
 	{
+		def df = new java.text.DecimalFormat("#,###,###,##0.00" )
+
 		// duplicates
 		println "Looking for duplicates..."
-		def dupl = descrs.groupBy{it.md5Hash}.findAll {it.value.size() > 1}
+		def duplmap = descrs.groupBy{it.md5Hash}.findAll {it.value.size() > 1}
+		def duplarr = []
+		
+		// copy the values of the duplmap to duplarr
+		duplmap.each {
+			duplarr << it.value
+		}
+		
+		println "Duplicates: " + duplarr.size
+		
+		duplarr = duplarr.sort false, {it[0].length}
+		
 		def size = 0
 
 		println "Duplicates: "
-		dupl.each {
-		  print it.value[0].name + ": " + it.value.size() + " occurrences in ["
-		  it.value.each {
-			print it.path + "/" + it.name + "; "
+		duplarr.each {
+		  println it[0].name + ": " + it.size() + " occurrences in ["
+		  it.each {
+			println "\t\t" + it.path + "/" + it.name + "; "
 			size += it.length
 		  }
 		  // size -= it.value[0].length
 		  println "]"
 		}
+		
 
-		println size + " bytes can be freed by removing duplicates"
+		println df.format(size) + " bytes can be freed by removing duplicates"
 	}
 
 }
